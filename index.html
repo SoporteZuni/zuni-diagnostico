@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico ZUNI — Soporte de Difusores</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:    #5F98D1;
+  --purple:  #7471B3;
+  --pink:    #894596;
+  --dark:    #1e1a3c;
+  --grad:    linear-gradient(135deg, #5F98D1 0%, #7471B3 55%, #894596 100%);
+  --grad-r:  linear-gradient(135deg, #894596, #7471B3, #5F98D1);
+
+  --bg:      #f5f4fb;
+  --surface: #ffffff;
+  --stone:   #e8e4f5;
+  --border:  #d4cef0;
+  --smoke:   #8a8aab;
+  --ink:     #1e1a3c;
+
+  --green:   #2e9e72;  --green-lt: #e3f5ee;
+  --amber:   #c07a1a;  --amber-lt: #fef3e2;
+  --red:     #b03060;  --red-lt:   #fce8ef;
+  --teal:    #5F98D1;  --teal-lt:  #e8f0fa;
+
+  --radius: 14px;
+  --shadow: 0 2px 20px rgba(91,78,153,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--grad);
+  padding: 20px 24px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+  pointer-events: none;
+}
+.logo-mark {
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px; color: #fff;
+  letter-spacing: -0.02em;
+  position: relative; z-index: 1;
+}
+.header-text { flex: 1; position: relative; z-index: 1; }
+header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; font-weight: 400;
+  color: #fff; line-height: 1.2;
+}
+header p { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 2px; }
+.ver-badge {
+  font-size: 10px; font-weight: 600;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.88);
+  padding: 4px 12px; border-radius: 20px;
+  white-space: nowrap;
+  position: relative; z-index: 1;
+}
+
+/* ── PROGRESS ── */
+.progress-wrap { background: var(--stone); height: 3px; }
+.progress-fill {
+  height: 3px;
+  background: var(--grad);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px rgba(116,113,179,0.5);
+}
+
+/* ── MAIN ── */
+main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
+
+/* ── SCREENS ── */
+.screen { display: none; }
+.screen.active {
+  display: block;
+  animation: rise 0.35s ease;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.step-tag {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--smoke); margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.step-tag::before {
+  content: '';
+  width: 16px; height: 2px;
+  background: var(--grad);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.card h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px; font-weight: 400;
+  line-height: 1.25; margin-bottom: 10px;
+  color: var(--ink);
+}
+.card .sub {
+  font-size: 14px; color: var(--smoke);
+  line-height: 1.6; margin-bottom: 24px;
+}
+
+/* ── SYMPTOM GRID ── */
+.sym-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 480px) { .sym-grid { grid-template-columns: 1fr; } }
+
+.sym-card {
+  padding: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.18s ease;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.sym-card:hover {
+  border-color: var(--purple);
+  background: rgba(116,113,179,0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(116,113,179,0.12);
+}
+.sym-icon { font-size: 26px; line-height: 1; flex-shrink: 0; }
+.sym-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; display: block; }
+.sym-desc  { font-size: 12px; color: var(--smoke); }
+
+/* NEW badge */
+.new-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--grad); color: #fff;
+  padding: 1px 6px; border-radius: 3px; margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* ── STAT CHIPS ── */
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.chip {
+  font-size: 11px; font-weight: 500;
+  padding: 4px 11px; border-radius: 20px;
+}
+.chip-purple { background: rgba(116,113,179,0.12); color: var(--purple); }
+.chip-red    { background: var(--red-lt);    color: var(--red); }
+.chip-teal   { background: var(--teal-lt);   color: var(--blue); }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: 8px; }
+.option {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left; font-family: inherit;
+  transition: all 0.18s ease; width: 100%;
+}
+.option:hover {
+  border-color: var(--purple);
+  background: rgba(116,113,179,0.05);
+  transform: translateX(3px);
+}
+.opt-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+.opt-label { font-size: 14px; font-weight: 600; color: var(--ink); display: block; margin-bottom: 2px; }
+.opt-desc  { font-size: 12px; color: var(--smoke); }
+
+/* ── RESULT BOXES ── */
+.result {
+  border-radius: 10px;
+  padding: 22px 20px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+.result.green  { background: var(--green-lt); border-color: #9dd4bb; }
+.result.amber  { background: var(--amber-lt); border-color: #f0c887; }
+.result.red    { background: var(--red-lt);   border-color: #e8a0b8; }
+.result.blue   { background: var(--teal-lt);  border-color: #a8c8e8; }
+
+.res-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.res-icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.result h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 19px; font-weight: 400;
+  line-height: 1.3; color: var(--ink);
+}
+
+/* ── STEPS LIST ── */
+.steps { list-style: none; margin-top: 12px; }
+.steps li {
+  display: flex; gap: 11px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-size: 13.5px; line-height: 1.5;
+}
+.steps li:last-child { border-bottom: none; }
+.sn {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; color: #fff;
+}
+.result.green  .sn { background: var(--green); }
+.result.amber  .sn { background: var(--amber); }
+.result.red    .sn { background: var(--red); }
+.result.blue   .sn { background: var(--blue); }
+
+/* ── CHECKLIST ── */
+.checklist { list-style: none; margin-top: 14px; }
+.checklist li {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 0; font-size: 14px; line-height: 1.5;
+}
+.chk {
+  width: 22px; height: 22px;
+  border: 2px solid var(--blue);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; margin-top: 1px;
+  transition: all 0.15s; color: var(--blue);
+}
+.chk.done { background: var(--blue); color: #fff; }
+.chk.done::after { content: '✓'; font-size: 12px; font-weight: 700; }
+.checklist li.checked > span { text-decoration: line-through; color: var(--smoke); }
+
+/* ── INFO BOX ── */
+.info-box {
+  background: var(--stone);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px; color: #555;
+  line-height: 1.6; margin-top: 14px;
+}
+.info-box strong { color: var(--ink); }
+
+/* ── ALERT ── */
+.alert-box {
+  display: flex; gap: 12px;
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 13px; line-height: 1.6;
+  margin-top: 14px;
+}
+.alert-box.warn { background: var(--amber-lt); border: 1px solid #f0c887; }
+.alert-box.danger { background: var(--red-lt); border: 1px solid #e8a0b8; }
+.alert-box.ok { background: var(--green-lt); border: 1px solid #9dd4bb; }
+.alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+.btn {
+  padding: 12px 20px;
+  border-radius: 8px; border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+  display: inline-flex; align-items: center; gap: 7px;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--grad); color: #fff;
+  box-shadow: 0 4px 14px rgba(116,113,179,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(116,113,179,0.4); }
+.btn-secondary {
+  background: transparent; color: var(--ink);
+  border: 1.5px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--purple); background: rgba(116,113,179,0.05); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { background: #8e2050; }
+.btn-ok { background: var(--green); color: #fff; }
+.btn-ok:hover { background: #24825e; }
+.btn-phone {
+  background: rgba(46,158,114,0.1);
+  color: var(--green);
+  border: 1.5px solid rgba(46,158,114,0.3);
+}
+.btn-phone:hover { background: var(--green); color: #fff; }
+.btn-wa {
+  background: #25D366; color: #fff;
+}
+.btn-wa:hover { background: #1da851; }
+.btn-android { background: #3ddc84; color: #0d1a0d; }
+.btn-android:hover { background: #2cb86c; }
+.btn-ios { background: #0d0d0d; color: #fff; }
+.btn-ios:hover { background: #333; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+/* ── APP DOWNLOAD CARD ── */
+.app-card {
+  background: linear-gradient(135deg, rgba(95,152,209,0.06), rgba(137,69,150,0.06));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-top: 14px;
+}
+.app-card-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--smoke); margin-bottom: 12px;
+}
+.app-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── BT STEPS ── */
+.bt-step {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.bt-step:last-child { border-bottom: none; }
+.bt-num {
+  width: 28px; height: 28px;
+  background: var(--grad); color: #fff;
+  border-radius: 50%; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.bt-body { flex: 1; }
+.bt-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.bt-desc  { font-size: 13px; color: var(--smoke); line-height: 1.5; }
+
+/* ── HIGHLIGHT CODE ── */
+.code-pill {
+  display: inline-block;
+  background: var(--stone);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 8px;
+  font-family: monospace; font-size: 14px; font-weight: 700;
+  color: var(--purple);
+  letter-spacing: 0.05em;
+}
+
+/* ── SUCCESS SCREEN ── */
+.success-screen {
+  text-align: center;
+  padding: 40px 20px;
+}
+.success-icon {
+  width: 72px; height: 72px;
+  background: var(--green-lt);
+  border: 2px solid #9dd4bb;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; margin: 0 auto 20px;
+}
+.success-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; font-weight: 400;
+  margin-bottom: 10px; color: var(--ink);
+}
+.success-sub { font-size: 14px; color: var(--smoke); max-width: 320px; margin: 0 auto 28px; line-height: 1.6; }
+
+/* ── MODEL PILL (selected) ── */
+.model-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  background: rgba(116,113,179,0.1); color: var(--purple);
+  border: 1px solid rgba(116,113,179,0.2);
+  padding: 3px 10px; border-radius: 20px;
+  margin-bottom: 14px; cursor: pointer;
+}
+.model-pill::before { content: '◉'; font-size: 8px; }
+
+/* ── VIDEO ── */
+.video-wrap {
+  position: relative; padding-bottom: 56.25%;
+  height: 0; overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  margin-top: 14px;
+}
+.video-wrap iframe {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; border: none;
+}
+
+/* ── ESCALATE BOX ── */
+.escalate-box {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-top: 16px;
+}
+.escalate-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--smoke); margin-bottom: 12px;
+}
+.escalate-nums { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── FOOTER ── */
+.footer-note {
+  text-align: center; font-size: 11px;
+  color: var(--smoke); margin-top: 40px; line-height: 1.8;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  header { padding: 16px; }
+  main   { padding: 20px 12px 60px; }
+  .card  { padding: 22px 18px; }
+  .card h2 { font-size: 21px; }
+  .app-btns { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">züni</div>
+  <div class="header-text">
+    <h1>Diagnóstico de Difusor</h1>
+    <p>Resuelve tu problema antes de llamar a soporte</p>
+  </div>
+  <span class="ver-badge">v2.0 · 2026</span>
+</header>
+<div class="progress-wrap">
+  <div class="progress-fill" id="progressBar" style="width:0%"></div>
+</div>
+
+<main>
+
+<!-- ══════════════════════════════════════════
+     PANTALLA 0 · HOME
+══════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="card">
+    <div class="step-tag">Guía de autodiagnóstico</div>
+    <h2>¿Cuál es el problema de tu difusor?</h2>
+    <p class="sub">El 72% de los reportes se resuelven sin visita técnica. Elige tu síntoma y te guiamos paso a paso.</p>
+
+    <div class="chips">
+      <span class="chip chip-purple">ZF600 · ZF1200 · ZF2400</span>
+      <span class="chip chip-red">Resolución: 5–20 min</span>
+      <span class="chip chip-teal">Sin necesidad de llamar</span>
+    </div>
+
+    <div class="sym-grid">
+      <button class="sym-card" onclick="go('no-aroma')">
+        <span class="sym-icon">😶</span>
+        <div><span class="sym-title">No emana aroma</span><span class="sym-desc">Encendido pero sin fragancia</span></div>
+      </button>
+      <button class="sym-card" onclick="go('poco-aroma')">
+        <span class="sym-icon">🌫️</span>
+        <div><span class="sym-title">Aroma muy débil</span><span class="sym-desc">Se huele poco o casi nada</span></div>
+      </button>
+      <button class="sym-card" onclick="go('mucho-aroma')">
+        <span class="sym-icon">💨</span>
+        <div><span class="sym-title">Aroma excesivo</span><span class="sym-desc">Huele demasiado fuerte o irrita</span></div>
+      </button>
+      <button class="sym-card" onclick="go('no-enciende')">
+        <span class="sym-icon">⚡</span>
+        <div><span class="sym-title">No enciende</span><span class="sym-desc">Sin luces ni respuesta</span></div>
+      </button>
+      <button class="sym-card" onclick="go('horario-roto')">
+        <span class="sym-icon">🕰️</span>
+        <div><span class="sym-title">No respeta el horario<span class="new-badge">Nuevo</span></span><span class="sym-desc">Enciende y apaga en horas incorrectas</span></div>
+      </button>
+      <button class="sym-card" onclick="go('ruido')">
+        <span class="sym-icon">🔊</span>
+        <div><span class="sym-title">Ruido inusual</span><span class="sym-desc">Vibración, traqueo o zumbido</span></div>
+      </button>
+      <button class="sym-card" onclick="go('derrame')">
+        <span class="sym-icon">💦</span>
+        <div><span class="sym-title">Derrame de líquido</span><span class="sym-desc">Goteo o manchas alrededor</span></div>
+      </button>
+      <button class="sym-card" onclick="go('horario')">
+        <span class="sym-icon">⚙️</span>
+        <div><span class="sym-title">Configuración / dudas</span><span class="sym-desc">Horarios, intensidad, refill</span></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · NO EMANA AROMA
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-no-aroma">
+  <div class="card">
+    <div class="step-tag">No emana aroma · Paso 1 de 3</div>
+    <h2>¿Tiene fragancia el difusor?</h2>
+    <p class="sub">La causa más frecuente: el tanque vacío. Confirma antes de continuar.</p>
+    <div class="options">
+      <button class="option" onclick="go('na-nivel-ok')">
+        <span class="opt-icon">✅</span>
+        <div><span class="opt-label">Sí, el tanque tiene líquido</span><span class="opt-desc">Puedo ver la fragancia dentro</span></div>
+      </button>
+      <button class="option" onclick="go('na-vacio')">
+        <span class="opt-icon">🪫</span>
+        <div><span class="opt-label">No, está vacío o muy bajo</span><span class="opt-desc">El tanque parece seco o casi sin líquido</span></div>
+      </button>
+      <button class="option" onclick="go('na-no-se')">
+        <span class="opt-icon">🤔</span>
+        <div><span class="opt-label">No sé cómo verificarlo</span><span class="opt-desc">No encuentro el tanque</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-na-nivel-ok">
+  <div class="card">
+    <div class="step-tag">No emana aroma · Paso 2 de 3</div>
+    <h2>¿Se escucha la bomba?</h2>
+    <p class="sub">Con el difusor encendido, acerca tu oído al equipo. La bomba hace un sonido suave de motor cuando funciona.</p>
+    <div class="options">
+      <button class="option" onclick="go('na-bomba-no')">
+        <span class="opt-icon">🔇</span>
+        <div><span class="opt-label">No, silencio total</span><span class="opt-desc">Nada aunque esté encendido</span></div>
+      </button>
+      <button class="option" onclick="go('na-bomba-si')">
+        <span class="opt-icon">🔉</span>
+        <div><span class="opt-label">Sí, suena pero no emana</span><span class="opt-desc">Se escucha el motor pero no sale aroma</span></div>
+      </button>
+      <button class="option" onclick="go('ruido')">
+        <span class="opt-icon">📢</span>
+        <div><span class="opt-label">Hace ruido extraño o fuerte</span><span class="opt-desc">Traqueo, zumbido o vibración intensa</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('no-aroma')">← Atrás</button></div>
+  </div>
+</div>
+
+<!-- Bomba en silencio: revisar programación -->
+<div class="screen" id="screen-na-bomba-no">
+  <div class="card">
+    <div class="step-tag">No emana aroma · Paso 3 de 3</div>
+    <h2>Bomba sin actividad</h2>
+    <p class="sub">Si hay luces pero la bomba no suena, generalmente es un problema de programación o de hora del sistema.</p>
+    <div class="options">
+      <button class="option" onclick="go('horario-roto')">
+        <span class="opt-icon">🕰️</span>
+        <div><span class="opt-label">Verificar horario y hora del sistema</span><span class="opt-desc">El difusor puede creer que está en horario de descanso</span></div>
+      </button>
+      <button class="option" onclick="go('horario-programar')">
+        <span class="opt-icon">🕐</span>
+        <div><span class="opt-label">Revisar la programación</span><span class="opt-desc">Confirmar que el horario activo esté bien configurado</span></div>
+      </button>
+      <button class="option" onclick="go('res-bomba-daniada')">
+        <span class="opt-icon">🛠️</span>
+        <div><span class="opt-label">La programación está bien y sigue sin funcionar</span><span class="opt-desc">Ya revisé horarios y todo está correcto</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('na-nivel-ok')">← Atrás</button></div>
+  </div>
+</div>
+
+<!-- Bomba suena pero no emana: boquilla -->
+<div class="screen" id="screen-na-bomba-si">
+  <div class="card">
+    <div class="step-tag">No emana aroma · Paso 3 de 3</div>
+    <h2>La bomba funciona pero no sale aroma</h2>
+    <p class="sub">Si la bomba suena con normalidad pero no sale fragancia, lo más probable es que la boquilla esté tapada. Es la falla silenciosa más común.</p>
+    <div class="result blue">
+      <div class="res-head"><span class="res-icon">🔬</span><h3>Limpieza de boquilla</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Apaga y desconecta</strong> el difusor antes de manipularlo.</span></li>
+        <li><span class="sn">2</span><span>Retira el tanque de fragancia con cuidado.</span></li>
+        <li><span class="sn">3</span><span>Limpia el exterior de la boquilla con un paño seco. Si ves residuos blancos o amarillos, está tapada.</span></li>
+        <li><span class="sn">4</span><span>Vierte <strong>50–100 ml de alcohol de caña</strong> al tanque y vuelve a colocarlo.</span></li>
+        <li><span class="sn">5</span><span>Enciende el difusor y deja que corra el alcohol <strong>3–5 minutos</strong>. El alcohol limpia la boquilla desde adentro.</span></li>
+        <li><span class="sn">6</span><span>Apaga, retira el alcohol, coloca la fragancia y enciende de nuevo.</span></li>
+        <li><span class="sn">7</span><span>Espera 3 minutos. Si ahora emana aroma, el problema está resuelto.</span></li>
+      </ul>
+    </div>
+    <div class="info-box">💡 <strong>Tip:</strong> Si los residuos son muy duros, puedes limpiar el exterior de la boquilla con un hisopo con alcohol antes del paso 4.</div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Boquilla tapada — limpieza con alcohol')">✓ Se resolvió</button>
+      <button class="btn btn-secondary" onclick="go('res-boquilla-fallo')">Sigue sin funcionar →</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-res-boquilla-fallo">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result red">
+      <div class="res-head"><span class="res-icon">🛠️</span><h3>Boquilla con obstrucción severa o daño en bomba</h3></div>
+      <p style="font-size:14px;color:#555;">La limpieza con alcohol no fue suficiente. Puede ser obstrucción severa o falla en la bomba.</p>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Toma una <strong>foto de la boquilla</strong> para evidencia antes de escalar.</span></li>
+        <li><span class="sn">2</span><span>Anota el <strong>número de serie</strong> del equipo (etiqueta en la parte posterior).</span></li>
+        <li><span class="sn">3</span><span>Contacta a soporte — indica que ya realizaste limpieza con alcohol sin resultado.</span></li>
+      </ul>
+    </div>
+    <div class="escalate-box">
+      <div class="escalate-title">Contactar soporte técnico</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20necesito%20soporte%20técnico%20para%20mi%20difusor%20ZUNI.%20Ya%20realicé%20limpieza%20de%20boquilla%20con%20alcohol%20sin%20resultado." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<!-- Tanque vacío -->
+<div class="screen" id="screen-na-vacio">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result green">
+      <div class="res-head"><span class="res-icon">✅</span><h3>Solución: Rellenar el tanque</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Desconecta el difusor</strong> antes de manipularlo.</span></li>
+        <li><span class="sn">2</span><span>Abre el compartimento y <strong>retira el tanque vacío</strong>.</span></li>
+        <li><span class="sn">3</span><span>Agrega <strong>50–100 ml de alcohol de caña</strong>, coloca el tanque y enciende <strong>3–5 min</strong> para limpiar.</span></li>
+        <li><span class="sn">4</span><span>Retira el alcohol y vierte tu <strong>botella completa de fragancia ZUNI</strong>.</span></li>
+        <li><span class="sn">5</span><span>Cierra el compartimento, enciende y espera <strong>3–5 minutos</strong>.</span></li>
+      </ul>
+    </div>
+    <div class="info-box">⚠️ <strong>Importante:</strong> No mezcles fragancias de distintas marcas o aromas en el mismo tanque. Esto contamina el aroma y puede dañar la bomba.</div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Tanque vacío — refill realizado')">✓ Se resolvió</button>
+      <button class="btn btn-secondary" onclick="go('na-nivel-ok')">Sigue sin aroma →</button>
+    </div>
+  </div>
+</div>
+
+<!-- No sabe verificar nivel -->
+<div class="screen" id="screen-na-no-se">
+  <div class="card">
+    <div class="step-tag">Cómo verificar el nivel</div>
+    <h2>Encuentra el tanque de fragancia</h2>
+    <p class="sub">El tanque es el recipiente donde se coloca la fragancia. Según el modelo puede estar en distintas posiciones.</p>
+    <ul class="steps" style="background:var(--stone);border-radius:10px;padding:16px 18px;">
+      <li><span class="sn" style="background:var(--purple);">1</span><span>Busca una tapa o compartimento en la parte <strong>frontal o trasera</strong> del difusor.</span></li>
+      <li><span class="sn" style="background:var(--purple);">2</span><span>Ábrela deslizando suavemente — en algunos modelos hay un botón de liberación.</span></li>
+      <li><span class="sn" style="background:var(--purple);">3</span><span>El tanque es un recipiente <strong>transparente o traslúcido</strong>. Puedes ver el líquido a través del material.</span></li>
+      <li><span class="sn" style="background:var(--purple);">4</span><span>Si ves el fondo sin líquido, el tanque está <strong>vacío y necesita refill</strong>.</span></li>
+    </ul>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="go('no-aroma')">Ya sé, retomar diagnóstico</button>
+      <button class="btn btn-secondary" onclick="go('horario-refill')">Ver guía de refill</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bomba dañada -->
+<div class="screen" id="screen-res-bomba-daniada">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result red">
+      <div class="res-head"><span class="res-icon">🛠️</span><h3>Posible falla en bomba — requiere revisión técnica</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Verifica que el <strong>eliminador (adaptador de corriente)</strong> esté bien conectado y sin daño.</span></li>
+        <li><span class="sn">2</span><span>Prueba en otra toma de corriente. A veces el problema es la toma, no el equipo.</span></li>
+        <li><span class="sn">3</span><span>Si en otra toma sigue igual, la <strong>bomba no tiene potencia</strong> — requiere cambio de equipo.</span></li>
+      </ul>
+    </div>
+    <div class="alert-box danger"><span class="alert-icon">📋</span><span>Ten a la mano el <strong>número de serie</strong> del equipo (etiqueta posterior) al contactar a soporte.</span></div>
+    <div class="escalate-box">
+      <div class="escalate-title">Contactar soporte técnico</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20mi%20difusor%20ZUNI%20no%20emana%20aroma%20y%20la%20bomba%20no%20responde.%20Necesito%20soporte." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · AROMA MUY DÉBIL
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-poco-aroma">
+  <div class="card">
+    <div class="step-tag">Aroma débil · Diagnóstico</div>
+    <h2>¿Cuándo empezó a oler menos?</h2>
+    <p class="sub">El momento en que comenzó el problema orienta hacia la causa más probable.</p>
+    <div class="options">
+      <button class="option" onclick="go('pa-gradual')">
+        <span class="opt-icon">📉</span>
+        <div><span class="opt-label">Poco a poco, con el tiempo</span><span class="opt-desc">La intensidad fue bajando gradualmente</span></div>
+      </button>
+      <button class="option" onclick="go('pa-repentino')">
+        <span class="opt-icon">⚡</span>
+        <div><span class="opt-label">De repente, un día específico</span><span class="opt-desc">Antes funcionaba bien y cambió de golpe</span></div>
+      </button>
+      <button class="option" onclick="go('pa-siempre')">
+        <span class="opt-icon">📦</span>
+        <div><span class="opt-label">Siempre ha olido poco</span><span class="opt-desc">Desde la instalación nunca ha sido fuerte</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-pa-gradual">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">🔧</span><h3>Desgaste gradual o fragancia agotándose</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Verifica el <strong>nivel del tanque</strong> — puede estar casi vacío aunque no lo parezca visualmente.</span></li>
+        <li><span class="sn">2</span><span>Incrementa la <strong>intensidad</strong> en la app o display. Prueba G12 y espera 5 min.</span></li>
+        <li><span class="sn">3</span><span>Limpia la boquilla con un paño seco — los residuos reducen el flujo de fragancia.</span></li>
+        <li><span class="sn">4</span><span>Si tiene más de 2 meses sin mantenimiento, programa una <strong>limpieza con alcohol</strong>.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Aroma débil gradual — ajuste de intensidad y limpieza')">✓ Se resolvió</button>
+    </div>
+    <div class="escalate-box" style="margin-top:14px;">
+      <div class="escalate-title">¿No se resolvió? Contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20el%20aroma%20de%20mi%20difusor%20ZUNI%20es%20débil%20y%20no%20mejoró%20con%20los%20ajustes." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row">
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-pa-repentino">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">⚙️</span><h3>Posible cambio de configuración o fragancia contaminada</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Verifica si alguien <strong>modificó la intensidad o el horario</strong> recientemente.</span></li>
+        <li><span class="sn">2</span><span>Revisa que no se hayan <strong>mezclado fragancias</strong> distintas en el mismo tanque.</span></li>
+        <li><span class="sn">3</span><span>Prueba con una <strong>fragancia nueva del mismo aroma</strong> para descartar contamiación.</span></li>
+        <li><span class="sn">4</span><span>Si el problema persiste con fragancia nueva, escala a soporte.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Aroma débil repentino — configuración o fragancia')">✓ Se resolvió</button>
+    </div>
+    <div class="escalate-box" style="margin-top:14px;">
+      <div class="escalate-title">¿No se resolvió? Contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20el%20aroma%20de%20mi%20difusor%20ZUNI%20bajó%20repentinamente%20y%20no%20mejoró." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row">
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-pa-siempre">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result blue">
+      <div class="res-head"><span class="res-icon">📐</span><h3>Posible problema de ubicación o configuración inicial</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Verifica la altura: el difusor debe estar a <strong>1.80–2.20 m del suelo</strong>.</span></li>
+        <li><span class="sn">2</span><span>La intensidad inicial para espacios estándar es <strong>G08–G12</strong>. Espacios grandes o con flujo de aire: G14–G16.</span></li>
+        <li><span class="sn">3</span><span>Verifica que el difusor no apunte hacia ventilación o puertas exteriores — el aroma se dispersa antes de percibirse.</span></li>
+        <li><span class="sn">4</span><span>Si el espacio es mayor a 130 m² (ZF600) o 400 m² (ZF1200), el modelo puede necesitar más potencia.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Aroma siempre débil — ajuste de ubicación e intensidad')">✓ Se resolvió</button>
+    </div>
+    <div class="escalate-box" style="margin-top:14px;">
+      <div class="escalate-title">¿No se resolvió? Contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20mi%20difusor%20ZUNI%20siempre%20ha%20olido%20débil%20desde%20la%20instalación." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row">
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · AROMA EXCESIVO (NUEVO)
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-mucho-aroma">
+  <div class="card">
+    <div class="step-tag">Aroma excesivo · Diagnóstico</div>
+    <h2>¿Qué tan fuerte es el problema?</h2>
+    <p class="sub">Un aroma muy intenso generalmente se resuelve ajustando la configuración, sin necesidad de visita técnica.</p>
+    <div class="options">
+      <button class="option" onclick="go('ma-intensidad')">
+        <span class="opt-icon">🎚️</span>
+        <div><span class="opt-label">Huele muy fuerte en todo el espacio</span><span class="opt-desc">La intensidad está muy alta</span></div>
+      </button>
+      <button class="option" onclick="go('ma-zona')">
+        <span class="opt-icon">📍</span>
+        <div><span class="opt-label">Solo huele fuerte cerca del equipo</span><span class="opt-desc">Muy concentrado junto al difusor</span></div>
+      </button>
+      <button class="option" onclick="go('ma-irritante')">
+        <span class="opt-icon">😮‍💨</span>
+        <div><span class="opt-label">El aroma es irritante o causa molestias</span><span class="opt-desc">Provoca malestar o quejas del personal</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-ma-intensidad">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result green">
+      <div class="res-head"><span class="res-icon">🎚️</span><h3>Reduce la intensidad</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Accede a la configuración por Bluetooth con la app <strong>ScentMarketing</strong> (contraseña: <span class="code-pill">8888</span>).</span></li>
+        <li><span class="sn">2</span><span>Reduce la intensidad en pasos de 2. Espera <strong>5 minutos entre ajustes</strong> para notar la diferencia.</span></li>
+        <li><span class="sn">3</span><span>Para espacios tipo A (cerrado, AC activo): <strong>G08–G12</strong>. Tipo B (semi abierto): <strong>G12–G16</strong>.</span></li>
+        <li><span class="sn">4</span><span>Guarda la configuración y verifica que el aroma sea homogéneo sin saturar.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Aroma excesivo — reducción de intensidad')">✓ Se resolvió</button>
+      <button class="btn btn-secondary" onclick="go('home')">← Inicio</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-ma-zona">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">📍</span><h3>Problema de orientación o posición</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Verifica que el difusor <strong>no apunte directamente hacia abajo</strong> ni hacia una pared cercana.</span></li>
+        <li><span class="sn">2</span><span>Oriéntalo de forma <strong>horizontal o ligeramente hacia arriba</strong>, apuntando al centro del espacio.</span></li>
+        <li><span class="sn">3</span><span>Si está muy cerca de la zona de recepción o caja, considera moverlo más lejos del tráfico directo.</span></li>
+        <li><span class="sn">4</span><span>Reduce la intensidad ligeramente (2 puntos) y vuelve a probar.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Aroma concentrado cerca del equipo — reorientación')">✓ Se resolvió</button>
+      <button class="btn btn-secondary" onclick="go('home')">← Inicio</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-ma-irritante">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result red">
+      <div class="res-head"><span class="res-icon">😮‍💨</span><h3>Aroma irritante — acción inmediata</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Apaga el difusor temporalmente</strong> para evitar más molestias.</span></li>
+        <li><span class="sn">2</span><span>Ventila el espacio durante 10–15 minutos.</span></li>
+        <li><span class="sn">3</span><span>Verifica que la fragancia sea la <strong>correcta y compatible</strong> con el equipo — una fragancia equivocada puede ser más intensa o irritante.</span></li>
+        <li><span class="sn">4</span><span>Cuando enciendas de nuevo, baja la intensidad al mínimo (G06) y sube gradualmente.</span></li>
+      </ul>
+    </div>
+    <div class="alert-box warn"><span class="alert-icon">⚠️</span><span>Si el aroma continúa siendo irritante con la intensidad mínima, puede ser una fragancia incompatible. Contacta a soporte.</span></div>
+    <div class="escalate-box">
+      <div class="escalate-title">Contactar soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20el%20aroma%20de%20mi%20difusor%20ZUNI%20es%20irritante%20incluso%20en%20intensidad%20mínima." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · NO RESPETA HORARIO (NUEVO)
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-horario-roto">
+  <div class="card">
+    <div class="step-tag">Horario incorrecto · Diagnóstico</div>
+    <h2>El difusor no respeta el horario programado</h2>
+    <p class="sub">Este es uno de los problemas más reportados recientemente. En la mayoría de casos, la causa es que <strong>el reloj interno del difusor tiene la hora equivocada</strong> — por ejemplo, cree que son las 2 AM cuando en realidad la tienda está abierta.</p>
+    <div class="alert-box warn" style="margin-bottom:20px;">
+      <span class="alert-icon">🕰️</span>
+      <div><strong>¿Por qué pasa esto?</strong> El reloj del difusor se puede desincronizar si el equipo estuvo apagado mucho tiempo, hubo un corte de luz, o nunca se configuró la hora correctamente desde la app.</div>
+    </div>
+    <div class="options">
+      <button class="option" onclick="go('hora-app')">
+        <span class="opt-icon">📱</span>
+        <div><span class="opt-label">Guiarme para sincronizar la hora</span><span class="opt-desc">Necesito conectar el difusor a la app</span></div>
+      </button>
+      <button class="option" onclick="go('horario-programar')">
+        <span class="opt-icon">🕐</span>
+        <div><span class="opt-label">Ya sincronicé la hora pero el horario sigue mal</span><span class="opt-desc">Quiero revisar la programación directamente</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-hora-app">
+  <div class="card">
+    <div class="step-tag">Sincronización de hora · Paso 1 de 2</div>
+    <h2>Descarga la app ScentMarketing</h2>
+    <p class="sub">Para sincronizar la hora del difusor necesitas la app oficial. Es gratuita y solo tarda un par de minutos.</p>
+
+    <div class="app-card">
+      <div class="app-card-title">Descargar ScentMarketing — gratuita</div>
+      <div class="app-btns">
+        <a class="btn btn-android" href="https://play.google.com/store/apps/details?id=com.IAA360.ChengHao" target="_blank">
+          ▶ Google Play — Android
+        </a>
+        <a class="btn btn-ios" href="https://apps.apple.com/us/app/scent-marketing/id1243308763" target="_blank">
+           App Store — iPhone
+        </a>
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-top:14px;">
+      📶 <strong>Importante:</strong> La conexión es por <strong>Bluetooth</strong> — no necesitas WiFi. Solo debes estar cerca del difusor (máximo 5 metros) con el Bluetooth del celular activado.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="go('hora-bluetooth')">Ya la tengo instalada →</button>
+      <button class="btn btn-secondary" onclick="go('home')">← Inicio</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-hora-bluetooth">
+  <div class="card">
+    <div class="step-tag">Sincronización de hora · Paso 2 de 2</div>
+    <h2>Conecta y sincroniza la hora</h2>
+    <p class="sub">Con la app instalada, sigue estos pasos para corregir el reloj del difusor.</p>
+
+    <div style="display:flex;flex-direction:column;gap:0;">
+      <div class="bt-step">
+        <div class="bt-num">1</div>
+        <div class="bt-body">
+          <div class="bt-title">Activa el Bluetooth de tu celular</div>
+          <div class="bt-desc">Ve a Configuración → Bluetooth y actívalo. No necesitas emparejar — la app lo hace sola.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">2</div>
+        <div class="bt-body">
+          <div class="bt-title">Abre ScentMarketing y busca tu dispositivo</div>
+          <div class="bt-desc">La app escaneará automáticamente. Verás el nombre o número de tu difusor en la lista.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">3</div>
+        <div class="bt-body">
+          <div class="bt-title">Ingresa la contraseña <span class="code-pill">8888</span></div>
+          <div class="bt-desc">Es la contraseña predeterminada para todos los difusores ZUNI. Si fue cambiada, contacta a soporte.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">4</div>
+        <div class="bt-body">
+          <div class="bt-title">Sincroniza la hora del teléfono</div>
+          <div class="bt-desc">Dentro de la app, busca la opción <strong>"Calibrar hora"</strong> o <strong>"Sync Time"</strong>. Al tocarla, el difusor tomará la hora exacta de tu celular.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">5</div>
+        <div class="bt-body">
+          <div class="bt-title">Verifica el horario programado</div>
+          <div class="bt-desc">En la sección de programación, confirma que la hora de inicio y fin coincidan con el horario comercial de la tienda. Guarda los cambios.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">6</div>
+        <div class="bt-body">
+          <div class="bt-title">Prueba el funcionamiento</div>
+          <div class="bt-desc">El difusor debería activarse correctamente en su próximo ciclo. Si estás dentro del horario configurado, debería arrancar de inmediato.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box ok" style="margin-top:16px;">
+      <span class="alert-icon">💡</span>
+      <span>Si el difusor estuvo apagado mucho tiempo (más de 24 horas), su reloj puede haberse perdido completamente. La sincronización desde la app lo corrige en segundos.</span>
+    </div>
+
+    <div class="divider"></div>
+    <h4 style="font-family:'DM Serif Display',serif;font-size:15px;margin:0 0 8px;color:var(--ink);">📱 Video de referencia — Configuración en la app</h4>
+    <video controls style="width:100%;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);background:#000;" preload="metadata">
+      <source src="prueba2.mp4" type="video/mp4">
+      Tu navegador no soporta video HTML5.
+    </video>
+
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Hora incorrecta — sincronización con app ScentMarketing')">✓ Se resolvió</button>
+      <button class="btn btn-secondary" onclick="go('hora-escalar')">No pude conectarme →</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-hora-escalar">
+  <div class="card">
+    <div class="step-tag">No pude conectarme</div>
+    <h2>Problemas de conexión Bluetooth</h2>
+    <p class="sub">Si la app no detecta el difusor, prueba estos pasos antes de llamar a soporte.</p>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">📶</span><h3>Checklist de conexión</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Asegúrate de estar a <strong>menos de 5 metros</strong> del difusor.</span></li>
+        <li><span class="sn">2</span><span><strong>Cierra y vuelve a abrir</strong> la app ScentMarketing.</span></li>
+        <li><span class="sn">3</span><span>Desactiva y reactiva el Bluetooth del celular y vuelve a buscar.</span></li>
+        <li><span class="sn">4</span><span>Verifica que el difusor esté <strong>encendido y con corriente</strong>.</span></li>
+        <li><span class="sn">5</span><span>Si otro celular detecta el difusor, el problema es el celular — prueba con otro dispositivo.</span></li>
+      </ul>
+    </div>
+    <div class="escalate-box">
+      <div class="escalate-title">Si ningún celular detecta el difusor — contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20no%20puedo%20conectar%20mi%20difusor%20ZUNI%20a%20la%20app%20ScentMarketing%20por%20Bluetooth." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · NO ENCIENDE
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-no-enciende">
+  <div class="card">
+    <div class="step-tag">No enciende · Verificación</div>
+    <h2>Verificación eléctrica paso a paso</h2>
+    <p class="sub">El 30% de los reportes de "no enciende" se resuelven aquí. Marca cada punto conforme lo verificas.</p>
+    <p style="font-size:12px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--smoke);margin-bottom:12px;">Marca cada punto verificado:</p>
+    <ul class="checklist" id="checklist-enc">
+      <li id="ce1"><div class="chk" onclick="togChk(this,'ce1')"></div><span>El cable de alimentación está bien conectado al difusor y al tomacorriente</span></li>
+      <li id="ce2"><div class="chk" onclick="togChk(this,'ce2')"></div><span>El tomacorriente funciona — lo probé con otro dispositivo (celular, lámpara)</span></li>
+      <li id="ce3"><div class="chk" onclick="togChk(this,'ce3')"></div><span>El eliminador (adaptador de corriente) no tiene daño visible ni olor quemado</span></li>
+      <li id="ce4"><div class="chk" onclick="togChk(this,'ce4')"></div><span>El botón de encendido no está atascado ni dañado físicamente (en modelos con botón)</span></li>
+    </ul>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="evalEnc()">Ver diagnóstico →</button>
+      <button class="btn btn-secondary" onclick="go('home')">← Inicio</button>
+    </div>
+    <div id="enc-result" style="display:none;margin-top:20px;"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · RUIDO INUSUAL
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-ruido">
+  <div class="card">
+    <div class="step-tag">Ruido inusual · Diagnóstico</div>
+    <h2>¿Cómo suena el ruido?</h2>
+    <p class="sub">El tipo de sonido identifica el componente que está fallando.</p>
+    <div class="options">
+      <button class="option" onclick="go('ruido-traqueo')">
+        <span class="opt-icon">🔩</span>
+        <div><span class="opt-label">Traqueo o golpeteo seco</span><span class="opt-desc">Repetitivo, como algo suelto adentro</span></div>
+      </button>
+      <button class="option" onclick="go('ruido-zumbido')">
+        <span class="opt-icon">🔊</span>
+        <div><span class="opt-label">Zumbido fuerte y constante</span><span class="opt-desc">Vibración intensa, más fuerte de lo normal</span></div>
+      </button>
+      <button class="option" onclick="go('ruido-chisporroteo')">
+        <span class="opt-icon">⚡</span>
+        <div><span class="opt-label">Chisporroteo o clic eléctrico</span><span class="opt-desc">Sonido eléctrico intermitente</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-ruido-traqueo">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">🔩</span><h3>Posible tanque mal instalado o puerta suelta</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Apaga y abre el compartimento. Verifica que el <strong>tanque esté bien encajado</strong> — debes escuchar el "clic" de encaje.</span></li>
+        <li><span class="sn">2</span><span>Revisa que la <strong>tapa del compartimento no esté suelta</strong> — si se desplazó, recolócala presionando suavemente.</span></li>
+        <li><span class="sn">3</span><span>Si el traqueo persiste con el difusor encendido sin tanque, la <strong>bomba tiene baja potencia</strong> y requiere cambio.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Traqueo — tanque recolocado')">✓ Se resolvió</button>
+    </div>
+    <div class="escalate-box" style="margin-top:14px;">
+      <div class="escalate-title">¿El traqueo persiste? Contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20mi%20difusor%20ZUNI%20hace%20traqueo%20interno%20que%20no%20se%20resuelve." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row">
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-ruido-zumbido">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result red">
+      <div class="res-head"><span class="res-icon">🛠️</span><h3>Posible bomba dañada</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Verifica que el difusor no esté sobre una <strong>superficie inestable</strong> (mesa de madera, estante que vibra).</span></li>
+        <li><span class="sn">2</span><span>Colócalo sobre una <strong>superficie sólida y plana</strong>. Si el zumbido disminuye, era vibración ambiental.</span></li>
+        <li><span class="sn">3</span><span>Si el zumbido viene del interior y persiste en superficie plana, la <strong>bomba puede estar dañada</strong>.</span></li>
+      </ul>
+    </div>
+    <div class="escalate-box">
+      <div class="escalate-title">Si el zumbido persiste — contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Mi%20difusor%20ZUNI%20hace%20un%20zumbido%20fuerte%20y%20constante." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-ruido-chisporroteo">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result red">
+      <div class="res-head"><span class="res-icon">⚡</span><h3>Posible falla eléctrica — acción inmediata</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Apaga el difusor inmediatamente</strong> y desconéctalo. Un chisporroteo eléctrico puede ser peligroso.</span></li>
+        <li><span class="sn">2</span><span>Inspecciona el <strong>eliminador (adaptador)</strong> — busca quemaduras, olor a plástico quemado o cables pelados.</span></li>
+        <li><span class="sn">3</span><span>Si el eliminador está dañado, <strong>no enciendas el equipo</strong> hasta reemplazarlo.</span></li>
+        <li><span class="sn">4</span><span>Si el eliminador se ve bien, el problema es interno — requiere revisión técnica.</span></li>
+      </ul>
+    </div>
+    <div class="alert-box danger"><span class="alert-icon">🚨</span><span><strong>No operes el equipo</strong> hasta que soporte lo revise. Un cortocircuito puede dañar el equipo permanentemente.</span></div>
+    <div class="escalate-box">
+      <div class="escalate-title">Contactar soporte — urgente</div>
+      <div class="escalate-nums">
+        <a class="btn btn-danger" href="tel:3330405600">📞 Llamar urgente</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=URGENTE:%20Mi%20difusor%20ZUNI%20hace%20chisporroteo%20eléctrico.%20Lo%20desconecté." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · DERRAME
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-derrame">
+  <div class="card">
+    <div class="step-tag">Derrame · Diagnóstico</div>
+    <h2>¿De dónde sale el líquido?</h2>
+    <p class="sub">El origen del derrame nos dice exactamente qué componente falla.</p>
+    <div class="options">
+      <button class="option" onclick="go('derrame-tanque')">
+        <span class="opt-icon">🧴</span>
+        <div><span class="opt-label">Del compartimento del tanque</span><span class="opt-desc">Gotea donde se coloca la fragancia</span></div>
+      </button>
+      <button class="option" onclick="go('derrame-base')">
+        <span class="opt-icon">🪣</span>
+        <div><span class="opt-label">De la parte inferior / base</span><span class="opt-desc">Se acumula líquido debajo del equipo</span></div>
+      </button>
+      <button class="option" onclick="go('derrame-boquilla')">
+        <span class="opt-icon">💧</span>
+        <div><span class="opt-label">De la boquilla / salida de aire</span><span class="opt-desc">Sale líquido en lugar de vapor</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-derrame-tanque">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">🧴</span><h3>Sello del tanque deficiente o tanque mal instalado</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Apaga el difusor</strong> y coloca un paño absorbente debajo.</span></li>
+        <li><span class="sn">2</span><span>Retira el tanque y límpialo por fuera. Verifica que no tenga <strong>fisuras o grietas</strong>.</span></li>
+        <li><span class="sn">3</span><span>Vuelve a insertar con cuidado hasta escuchar el <strong>"clic" de encaje</strong>.</span></li>
+        <li><span class="sn">4</span><span>Si el tanque tiene grietas, <strong>no hay solución temporal</strong> — solicita cambio de tanque.</span></li>
+        <li><span class="sn">5</span><span>Si el sello del compartimento está deteriorado (hule reseco), requiere cambio de equipo.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Derrame del tanque — tanque reposicionado')">✓ Se resolvió</button>
+    </div>
+    <div class="escalate-box" style="margin-top:14px;">
+      <div class="escalate-title">¿El derrame persiste? Contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20mi%20difusor%20ZUNI%20tiene%20derrame%20en%20el%20compartimento%20del%20tanque." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row">
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-derrame-base">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result red">
+      <div class="res-head"><span class="res-icon">🛠️</span><h3>Fuga interna — requiere revisión técnica</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Apaga y desconecta inmediatamente.</strong> El líquido cerca de componentes eléctricos es peligroso.</span></li>
+        <li><span class="sn">2</span><span>Limpia el líquido con paño absorbente <strong>sin voltear el equipo</strong>.</span></li>
+        <li><span class="sn">3</span><span>Toma una <strong>foto del derrame</strong> como evidencia antes de llamar a soporte.</span></li>
+        <li><span class="sn">4</span><span><strong>No vuelvas a encender</strong> hasta que soporte lo revise.</span></li>
+      </ul>
+    </div>
+    <div class="alert-box danger"><span class="alert-icon">🚨</span><span>Derrame en la base indica fuga interna. Generalmente requiere cambio de equipo.</span></div>
+    <div class="escalate-box">
+      <div class="escalate-title">Contactar soporte — urgente</div>
+      <div class="escalate-nums">
+        <a class="btn btn-danger" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Mi%20difusor%20ZUNI%20tiene%20derrame%20en%20la%20base.%20Ya%20lo%20desconecté." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-derrame-boquilla">
+  <div class="card">
+    <div class="step-tag">Resultado de diagnóstico</div>
+    <div class="result amber">
+      <div class="res-head"><span class="res-icon">💧</span><h3>Condensación o sobrepresión en bomba</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Reduce la intensidad a <strong>G08–G10</strong>. Una intensidad muy alta puede generar goteo por condensación.</span></li>
+        <li><span class="sn">2</span><span>Verifica que la boquilla no apunte hacia <strong>superficies frías</strong> (vidrio, metal) — causan condensación.</span></li>
+        <li><span class="sn">3</span><span>Orienta el difusor <strong>ligeramente hacia arriba</strong> para evitar que el líquido gotee.</span></li>
+        <li><span class="sn">4</span><span>Si persiste con intensidad baja, puede ser la válvula de retorno — requiere revisión técnica.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ok" onclick="resuelto('Derrame en boquilla — ajuste de intensidad y orientación')">✓ Se resolvió</button>
+    </div>
+    <div class="escalate-box" style="margin-top:14px;">
+      <div class="escalate-title">¿El goteo persiste? Contacta soporte</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20mi%20difusor%20ZUNI%20gotea%20por%20la%20boquilla%20con%20intensidad%20baja." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row">
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     FLUJO · CONFIGURACIÓN
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-horario">
+  <div class="card">
+    <div class="step-tag">Configuración · Elige tu duda</div>
+    <h2>¿Qué necesitas configurar?</h2>
+    <p class="sub">Las dudas más frecuentes — sin necesidad de llamar a soporte.</p>
+    <div class="options">
+      <button class="option" onclick="go('horario-programar')">
+        <span class="opt-icon">🕐</span>
+        <div><span class="opt-label">Programar horario de encendido / apagado</span><span class="opt-desc">Quiero que funcione solo en ciertos horarios</span></div>
+      </button>
+      <button class="option" onclick="go('horario-intensidad')">
+        <span class="opt-icon">🎚️</span>
+        <div><span class="opt-label">Ajustar la intensidad del aroma</span><span class="opt-desc">Quiero que huela más o menos fuerte</span></div>
+      </button>
+      <button class="option" onclick="go('horario-refill')">
+        <span class="opt-icon">🧴</span>
+        <div><span class="opt-label">Cómo hacer el refill (rellenar)</span><span class="opt-desc">Necesito cambiar la fragancia</span></div>
+      </button>
+      <button class="option" onclick="go('hora-app')">
+        <span class="opt-icon">🕰️</span>
+        <div><span class="opt-label">Descargar app y sincronizar la hora</span><span class="opt-desc">Conectar el difusor por Bluetooth</span></div>
+      </button>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Cambiar síntoma</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-horario-programar">
+  <div class="card">
+    <div class="step-tag">Guía de configuración</div>
+    <div class="result blue">
+      <div class="res-head"><span class="res-icon">🕐</span><h3>Cómo programar el horario</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Abre la app <strong>ScentMarketing</strong> y activa el Bluetooth de tu celular.</span></li>
+        <li><span class="sn">2</span><span>Selecciona tu dispositivo de la lista. Ingresa la contraseña <span class="code-pill">8888</span>.</span></li>
+        <li><span class="sn">3</span><span>Navega a <strong>Programación</strong> o <strong>Schedule</strong>.</span></li>
+        <li><span class="sn">4</span><span>Selecciona los <strong>días activos</strong> y configura la hora de inicio y fin.</span></li>
+        <li><span class="sn">5</span><span>Guarda y verifica que la <strong>hora del sistema sea correcta</strong>. Si no lo es, usa "Calibrar hora".</span></li>
+      </ul>
+    </div>
+    <div class="info-box">💡 Si la hora del sistema está desfasada, el horario no respetará tu programación — sincroniza primero desde la opción "Calibrar hora" o "Sync Time".</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="go('home')">← Inicio</button>
+      <button class="btn btn-secondary" onclick="go('hora-app')">Descargar la app</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-horario-intensidad">
+  <div class="card">
+    <div class="step-tag">Guía de configuración</div>
+    <div class="result blue">
+      <div class="res-head"><span class="res-icon">🎚️</span><h3>Cómo ajustar la intensidad</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span>Accede a la app ScentMarketing o al menú del display → <strong>Configuración → Intensidad</strong>.</span></li>
+        <li><span class="sn">2</span><span>Espacio pequeño u oficina: <strong>G06–G08</strong>.</span></li>
+        <li><span class="sn">3</span><span>Espacio estándar cerrado (Tipo A, hasta 130 m²): <strong>G08–G12</strong>.</span></li>
+        <li><span class="sn">4</span><span>Espacio con apertura de puertas (Tipo B): <strong>G12–G16</strong>.</span></li>
+        <li><span class="sn">5</span><span>Centro comercial o alto tráfico (Tipo C): <strong>G16–G20</strong>.</span></li>
+        <li><span class="sn">6</span><span>Guarda y espera <strong>5 minutos</strong> para notar la diferencia.</span></li>
+      </ul>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+<div class="screen" id="screen-horario-refill">
+  <div class="card">
+    <div class="step-tag">Guía de configuración</div>
+    <div class="result green">
+      <div class="res-head"><span class="res-icon">🧴</span><h3>Guía completa de refill</h3></div>
+      <ul class="steps">
+        <li><span class="sn">1</span><span><strong>Desconecta el difusor</strong> antes de manipularlo.</span></li>
+        <li><span class="sn">2</span><span>Abre el compartimento y <strong>retira el tanque vacío</strong> sin voltear el equipo.</span></li>
+        <li><span class="sn">3</span><span>Agrega <strong>50–100 ml de alcohol de caña</strong> al tanque, colócalo y enciende el difusor <strong>3–5 minutos</strong> para limpiar el sistema.</span></li>
+        <li><span class="sn">4</span><span>Apaga, retira el alcohol y <strong>vierte tu botella completa de fragancia ZUNI</strong>.</span></li>
+        <li><span class="sn">5</span><span>Cierra el compartimento, enciende y espera <strong>3–5 minutos</strong> para el primer ciclo.</span></li>
+      </ul>
+    </div>
+    <div class="info-box">⚠️ <strong>Importante:</strong> No mezcles fragancias de distintas marcas. Usar fragancia incompatible puede dañar la bomba y anular la garantía.</div>
+
+    <h4 style="font-family:'DM Serif Display',serif;font-size:16px;margin:0 0 6px;color:var(--ink);">📦 Video — Instalación y apertura del equipo</h4>
+    <p style="font-size:13px;color:var(--smoke);margin-bottom:10px;">Cómo abrir el difusor, agregar el aroma y dejarlo listo para funcionar.</p>
+    <video controls style="width:100%;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);background:#000;" preload="metadata">
+      <source src="prueba1.mp4" type="video/mp4">
+      Tu navegador no soporta video HTML5.
+    </video>
+
+    <div class="divider"></div>
+
+    <h4 style="font-family:'DM Serif Display',serif;font-size:16px;margin:0 0 6px;color:var(--ink);">📱 Video — Configuración en la app ScentMarketing</h4>
+    <p style="font-size:13px;color:var(--smoke);margin-bottom:10px;">Cómo configurar los días, horarios e intensidad desde la app.</p>
+    <video controls style="width:100%;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);background:#000;" preload="metadata">
+      <source src="prueba2.mp4" type="video/mp4">
+      Tu navegador no soporta video HTML5.
+    </video>
+
+    <div class="btn-row"><button class="btn btn-primary" onclick="go('home')">← Inicio</button></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PANTALLA DE ÉXITO
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-resuelto">
+  <div class="card">
+    <div class="success-screen">
+      <div class="success-icon">✓</div>
+      <div class="success-title">¡Problema resuelto!</div>
+      <p class="success-sub" id="successMsg">Tu difusor ZUNI está funcionando de nuevo.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-primary" onclick="go('home')">← Nuevo diagnóstico</button>
+        <a class="btn btn-secondary" href="https://wa.me/523316719518?text=Hola,%20resolví%20mi%20problema%20con%20el%20autodiagnóstico%20ZUNI." target="_blank">💬 Confirmar con soporte</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<p class="footer-note">
+  ZUNI · Soporte técnico · Base de conocimiento<br>
+  📞 33 3040 5600 ext. 3 &nbsp;·&nbsp; 33 1671 9518<br>
+  Actualizado Abril 2026
+</p>
+
+</main>
+
+<script>
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyLAAK59B7ZAXP1o4jgouMQxp2kG41v3I1QSXmTHiZnR0H348_d-vnStY9Q_qq2f9YO/exec';
+
+let navHistory = ['home'];
+let sessionStart = Date.now();
+
+// ── NAVIGATION ──
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  (el || document.getElementById('screen-home')).classList.add('active');
+  navHistory.push(id);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress();
+  track('Navegó a', id);
+}
+
+function updateProgress() {
+  const steps = navHistory.filter(h => h !== 'home').length;
+  const pct = Math.min(steps * 18, 90);
+  const bar = document.getElementById('progressBar');
+  bar.style.width = (navHistory[navHistory.length-1] === 'home' ? 0 : pct) + '%';
+}
+
+// ── CHECKLIST: NO ENCIENDE ──
+function togChk(el, liId) {
+  el.classList.toggle('done');
+  document.getElementById(liId).classList.toggle('checked');
+}
+
+function evalEnc() {
+  const checks = document.querySelectorAll('#checklist-enc .chk');
+  const done = [...checks].filter(c => c.classList.contains('done')).length;
+  const total = checks.length;
+  const div = document.getElementById('enc-result');
+  div.style.display = 'block';
+
+  if (done === total) {
+    div.innerHTML = `
+      <div class="result red" style="margin:0">
+        <div class="res-head"><span class="res-icon">🛠️</span><h3>Falla interna — requiere cambio de equipo</h3></div>
+        <p style="font-size:14px;color:#555;">Verificaste todos los puntos y el equipo sigue sin encender. La falla es interna.</p>
+      </div>
+      <div class="escalate-box" style="margin-top:14px;">
+        <div class="escalate-title">Ten listo el número de serie al llamar</div>
+        <div class="escalate-nums">
+          <a class="btn btn-danger" href="tel:3330405600">📞 Solicitar cambio de equipo</a>
+          <a class="btn btn-wa" href="https://wa.me/523316719518?text=Mi%20difusor%20ZUNI%20no%20enciende.%20Verifiqué%20todos%20los%20puntos%20eléctricos." target="_blank">💬 WhatsApp</a>
+        </div>
+      </div>`;
+    track('Resultado', 'no-enciende-falla-interna');
+  } else if (done >= 2) {
+    div.innerHTML = `
+      <div class="result amber" style="margin:0">
+        <div class="res-head"><span class="res-icon">⚠️</span><h3>Completa la verificación antes de escalar</h3></div>
+        <p style="font-size:14px;color:#555;">Hay ${total - done} punto(s) sin verificar. La solución puede estar en alguno de ellos.</p>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <div class="result blue" style="margin:0">
+        <div class="res-head"><span class="res-icon">🔍</span><h3>Empieza por los primeros puntos</h3></div>
+        <p style="font-size:14px;color:#555;">La mayoría de casos de "no enciende" se resuelven en el primer o segundo punto de la lista.</p>
+      </div>`;
+  }
+}
+
+// ── RESUELTO ──
+function resuelto(motivo) {
+  document.getElementById('successMsg').textContent = motivo ? `Solución aplicada: ${motivo}.` : 'Tu difusor ZUNI está funcionando de nuevo.';
+  const totalMin = Math.round((Date.now() - sessionStart) / 60000);
+  document.getElementById('progressBar').style.width = '100%';
+  go('resuelto');
+  track('RESUELTO', motivo || 'sin motivo', totalMin + ' min');
+}
+
+// ── TRACKING ──
+function track(evento, detalle, extra) {
+  try {
+    fetch(SHEETS_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: 'Cliente (autodiagnóstico)',
+        evento: evento,
+        guia: 'Autodiagnóstico',
+        seccion: detalle || '',
+        duracion: extra || '',
+        fecha: new Date().toLocaleDateString('es-MX')
+      })
+    });
+  } catch(e) {}
+}
+
+// Init
+go('home');
+</script>
+</body>
+</html>
