@@ -456,6 +456,25 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
   .card h2 { font-size: 21px; }
   .app-btns { flex-direction: column; }
 }
+
+/* ── SURVEY ── */
+.survey-wrap { text-align:center; padding:32px 20px 0; }
+.survey-title { font-family:'DM Serif Display',serif; font-size:22px; margin-bottom:6px; }
+.survey-sub { font-size:13px; color:var(--smoke); margin-bottom:22px; }
+.stars { display:flex; justify-content:center; gap:10px; margin-bottom:22px; }
+.star { font-size:36px; cursor:pointer; transition:transform .15s; filter:grayscale(1) opacity(.4); }
+.star.active { filter:none; transform:scale(1.15); }
+.survey-comment { width:100%; background:var(--stone); border:1px solid var(--border);
+  border-radius:8px; padding:12px 14px; font-family:'DM Sans',sans-serif; font-size:14px;
+  color:var(--ink); outline:none; min-height:80px; resize:vertical; margin-bottom:14px;
+  transition:border-color .15s; }
+.survey-comment:focus { border-color:var(--purple); }
+.survey-sent { padding:20px; text-align:center; }
+.survey-sent-icon { font-size:40px; margin-bottom:10px; }
+.survey-sent-title { font-family:'DM Serif Display',serif; font-size:20px; margin-bottom:6px; }
+.survey-sent-sub { font-size:13px; color:var(--smoke); }
+
+
 </style>
 </head>
 <body>
@@ -482,6 +501,25 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
     <div class="step-tag">Guía de autodiagnóstico</div>
     <h2>¿Cuál es el problema de tu difusor?</h2>
     <p class="sub">El 72% de los reportes se resuelven sin visita técnica. Elige tu síntoma y te guiamos paso a paso.</p>
+
+    <div style="background:var(--stone);border-radius:10px;padding:16px 18px;margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--smoke);margin-bottom:10px;">📍 Identifícate (opcional pero recomendado)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <label style="font-size:11px;color:var(--smoke);display:block;margin-bottom:4px;">Nombre de tu empresa</label>
+          <input id="sucCliente" type="text" placeholder="Ej: Tienda ABC" autocomplete="organization"
+            style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#7471B3'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--smoke);display:block;margin-bottom:4px;">Nombre de la sucursal</label>
+          <input id="sucSucursal" type="text" placeholder="Ej: Sucursal Centro" autocomplete="off"
+            style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#7471B3'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--smoke);margin-top:8px;">Esto nos ayuda a identificar tu equipo y darte un mejor seguimiento.</div>
+    </div>
 
     <div class="chips">
       <span class="chip chip-purple">ZF600 · ZF1200 · ZF2400</span>
@@ -1383,6 +1421,14 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
     </div>
     <div class="info-box">⚠️ <strong>Importante:</strong> No mezcles fragancias de distintas marcas. Usar fragancia incompatible puede dañar la bomba y anular la garantía.</div>
 
+    <h4 style="font-family:'DM Serif Display',serif;font-size:16px;margin:22px 0 12px;color:var(--ink);">📹 Video tutorial — Cómo hacer refill</h4>
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/1xcSDYy3Dl4?si=fokkvZHMjo3MQHE_" title="Tutorial refill ZUNI" allowfullscreen></iframe>
+    </div>
+    <p style="font-size:12px;color:var(--smoke);margin-top:8px;text-align:center;">Duración aprox. 4 minutos</p>
+
+    <div class="divider"></div>
+
     <h4 style="font-family:'DM Serif Display',serif;font-size:16px;margin:0 0 6px;color:var(--ink);">📦 Video — Instalación y apertura del equipo</h4>
     <p style="font-size:13px;color:var(--smoke);margin-bottom:10px;">Cómo abrir el difusor, agregar el aroma y dejarlo listo para funcionar.</p>
     <video controls style="width:100%;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.1);background:#000;" preload="metadata">
@@ -1428,6 +1474,39 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
   Actualizado Abril 2026
 </p>
 
+
+<!-- SURVEY SCREEN -->
+<div class="screen" id="screen-survey">
+  <div class="card">
+    <div id="surveyForm">
+      <div class="survey-wrap">
+        <div class="survey-title">¿Pudiste resolver tu problema?</div>
+        <p class="survey-sub">Tu opinión nos ayuda a mejorar esta guía</p>
+        <div class="stars" id="starRow">
+          <span class="star" onclick="rateStar(1)" data-v="1">⭐</span>
+          <span class="star" onclick="rateStar(2)" data-v="2">⭐</span>
+          <span class="star" onclick="rateStar(3)" data-v="3">⭐</span>
+          <span class="star" onclick="rateStar(4)" data-v="4">⭐</span>
+          <span class="star" onclick="rateStar(5)" data-v="5">⭐</span>
+        </div>
+        <textarea class="survey-comment" id="surveyComment" placeholder="Comentario opcional — ¿qué funcionó o qué no? (opcional)"></textarea>
+        <div class="btn-row" style="justify-content:center;">
+          <button class="btn btn-primary" onclick="sendSurvey()">Enviar →</button>
+          <button class="btn btn-secondary" onclick="go('home')">Omitir</button>
+        </div>
+      </div>
+    </div>
+    <div id="surveySent" style="display:none;" class="survey-sent">
+      <div class="survey-sent-icon">🙏</div>
+      <div class="survey-sent-title">¡Gracias por tu opinión!</div>
+      <p class="survey-sent-sub">Tu feedback ayuda a mejorar el soporte para todos los clientes ZUNI.</p>
+      <div class="btn-row" style="justify-content:center;margin-top:20px;">
+        <button class="btn btn-primary" onclick="go('home')">← Nuevo diagnóstico</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <script>
@@ -1435,6 +1514,9 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyLAAK59B7ZAXP1o4jgo
 
 let navHistory = ['home'];
 let sessionStart = Date.now();
+
+
+
 
 // ── NAVIGATION ──
 function go(id) {
@@ -1501,18 +1583,35 @@ function resuelto(motivo) {
   document.getElementById('successMsg').textContent = motivo ? `Solución aplicada: ${motivo}.` : 'Tu difusor ZUNI está funcionando de nuevo.';
   const totalMin = Math.round((Date.now() - sessionStart) / 60000);
   document.getElementById('progressBar').style.width = '100%';
-  go('resuelto');
   track('RESUELTO', motivo || 'sin motivo', totalMin + ' min');
+  // Go to survey
+  surveyContext = motivo || 'Diagnóstico completado';
+  surveyRating = 0;
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+  document.getElementById('surveyComment').value = '';
+  document.getElementById('surveyForm').style.display = 'block';
+  document.getElementById('surveySent').style.display = 'none';
+  go('survey');
 }
 
 // ── TRACKING ──
+function getSucursal() {
+  const c = (document.getElementById('sucCliente')?.value||'').trim();
+  const s = (document.getElementById('sucSucursal')?.value||'').trim();
+  if (c && s) return c + ' — ' + s;
+  if (c) return c;
+  if (s) return s;
+  return 'Sin identificar';
+}
+
 function track(evento, detalle, extra) {
   try {
+    const suc = getSucursal();
     fetch(SHEETS_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nombre: 'Cliente (autodiagnóstico)',
+        nombre: suc,
         evento: evento,
         guia: 'Autodiagnóstico',
         seccion: detalle || '',
@@ -1525,6 +1624,26 @@ function track(evento, detalle, extra) {
 
 // Init
 go('home');
+
+// ── SURVEY ──
+let surveyRating = 0;
+let surveyContext = '';
+
+function rateStar(n) {
+  surveyRating = n;
+  document.querySelectorAll('.star').forEach((s,i) => {
+    s.classList.toggle('active', i < n);
+  });
+}
+
+function sendSurvey() {
+  const comment = document.getElementById('surveyComment').value.trim();
+  if (!surveyRating) { rateStar(5); return; } // nudge to rate
+  track('Encuesta', surveyContext, surveyRating + ' estrellas' + (comment ? ' | ' + comment : ''));
+  document.getElementById('surveyForm').style.display = 'none';
+  document.getElementById('surveySent').style.display = 'block';
+}
+
 </script>
 </body>
 </html>
