@@ -416,17 +416,7 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
 .model-pill::before { content: '◉'; font-size: 8px; }
 
 /* ── VIDEO ── */
-.video-wrap {
-  position: relative; padding-bottom: 56.25%;
-  height: 0; overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  margin-top: 14px;
-}
-.video-wrap iframe {
-  position: absolute; top: 0; left: 0;
-  width: 100%; height: 100%; border: none;
-}
+
 
 /* ── ESCALATE BOX ── */
 .escalate-box {
@@ -786,7 +776,7 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
       <div class="res-head"><span class="res-icon">🔧</span><h3>Desgaste gradual o fragancia agotándose</h3></div>
       <ul class="steps">
         <li><span class="sn">1</span><span>Verifica el <strong>nivel del tanque</strong> — puede estar casi vacío aunque no lo parezca visualmente.</span></li>
-        <li><span class="sn">2</span><span>Incrementa la <strong>intensidad</strong> en la app o display. Prueba G12 y espera 5 min.</span></li>
+        <li><span class="sn">2</span><span>Verifica el <strong>nivel del tanque</strong> — puede estar casi vacío aunque visualmente no lo parezca.</span></li>
         <li><span class="sn">3</span><span>Limpia la boquilla con un paño seco — los residuos reducen el flujo de fragancia.</span></li>
         <li><span class="sn">4</span><span>Si tiene más de 2 meses sin mantenimiento, programa una <strong>limpieza con alcohol</strong>.</span></li>
       </ul>
@@ -842,7 +832,7 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
       <div class="res-head"><span class="res-icon">📐</span><h3>Posible problema de ubicación o configuración inicial</h3></div>
       <ul class="steps">
         <li><span class="sn">1</span><span>Verifica la altura: el difusor debe estar a <strong>1.80–2.20 m del suelo</strong>.</span></li>
-        <li><span class="sn">2</span><span>La intensidad inicial para espacios estándar es <strong>G08–G12</strong>. Espacios grandes o con flujo de aire: G14–G16.</span></li>
+        <li><span class="sn">2</span><span>Verifica que la configuración de intensidad <strong>no haya sido modificada</strong> recientemente sin autorización.</span></li>
         <li><span class="sn">3</span><span>Verifica que el difusor no apunte hacia ventilación o puertas exteriores — el aroma se dispersa antes de percibirse.</span></li>
         <li><span class="sn">4</span><span>Si el espacio es mayor a 130 m² (ZF600) o 400 m² (ZF1200), el modelo puede necesitar más potencia.</span></li>
       </ul>
@@ -918,7 +908,7 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
         <li><span class="sn">1</span><span>Verifica que el difusor <strong>no apunte directamente hacia abajo</strong> ni hacia una pared cercana.</span></li>
         <li><span class="sn">2</span><span>Oriéntalo de forma <strong>horizontal o ligeramente hacia arriba</strong>, apuntando al centro del espacio.</span></li>
         <li><span class="sn">3</span><span>Si está muy cerca de la zona de recepción o caja, considera moverlo más lejos del tráfico directo.</span></li>
-        <li><span class="sn">4</span><span>Reduce la intensidad ligeramente (2 puntos) y vuelve a probar.</span></li>
+        <li><span class="sn">4</span><span>Contacta a soporte si el problema persiste — un técnico puede ajustar la configuración correctamente.</span></li>
       </ul>
     </div>
     <div class="btn-row">
@@ -937,7 +927,7 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
         <li><span class="sn">1</span><span><strong>Apaga el difusor temporalmente</strong> para evitar más molestias.</span></li>
         <li><span class="sn">2</span><span>Ventila el espacio durante 10–15 minutos.</span></li>
         <li><span class="sn">3</span><span>Verifica que la fragancia sea la <strong>correcta y compatible</strong> con el equipo — una fragancia equivocada puede ser más intensa o irritante.</span></li>
-        <li><span class="sn">4</span><span>Cuando enciendas de nuevo, baja la intensidad al mínimo (G06) y sube gradualmente.</span></li>
+        <li><span class="sn">4</span><span>Cuando enciendas de nuevo, <strong>no modifiques la configuración</strong> — contacta a soporte para que un técnico ajuste los parámetros correctamente.</span></li>
       </ul>
     </div>
     <div class="alert-box warn"><span class="alert-icon">⚠️</span><span>Si el aroma continúa siendo irritante con la intensidad mínima, puede ser una fragancia incompatible. Contacta a soporte.</span></div>
@@ -1013,6 +1003,10 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
     <div class="step-tag">Sincronización de hora · Paso 2 de 2</div>
     <h2>Conecta y sincroniza la hora</h2>
     <p class="sub">Con la app instalada, sigue estos pasos para corregir el reloj del difusor.</p>
+    <div class="alert-box danger" style="margin-bottom:18px;">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>Solo sincroniza la hora — no modifiques nada más.</strong> La intensidad, horarios y demás configuraciones fueron ajustadas por nuestros técnicos para tu espacio. Cualquier cambio adicional puede afectar tu servicio. Si necesitas ajustar algo más, contáctanos.</div>
+    </div>
 
     <div style="display:flex;flex-direction:column;gap:0;">
       <div class="bt-step">
@@ -1039,29 +1033,22 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
       <div class="bt-step">
         <div class="bt-num">4</div>
         <div class="bt-body">
-          <div class="bt-title">Sincroniza la hora del teléfono</div>
-          <div class="bt-desc">Dentro de la app, busca la opción <strong>"Calibrar hora"</strong> o <strong>"Sync Time"</strong>. Al tocarla, el difusor tomará la hora exacta de tu celular.</div>
+          <div class="bt-title">La hora se sincroniza automáticamente</div>
+          <div class="bt-desc">Al conectarte vía Bluetooth, la app toma la hora exacta de tu celular y la aplica al difusor de forma automática. No necesitas tocar ningún botón adicional.</div>
         </div>
       </div>
       <div class="bt-step">
         <div class="bt-num">5</div>
         <div class="bt-body">
-          <div class="bt-title">Verifica el horario programado</div>
-          <div class="bt-desc">En la sección de programación, confirma que la hora de inicio y fin coincidan con el horario comercial de la tienda. Guarda los cambios.</div>
-        </div>
-      </div>
-      <div class="bt-step">
-        <div class="bt-num">6</div>
-        <div class="bt-body">
-          <div class="bt-title">Prueba el funcionamiento</div>
-          <div class="bt-desc">El difusor debería activarse correctamente en su próximo ciclo. Si estás dentro del horario configurado, debería arrancar de inmediato.</div>
+          <div class="bt-title">Desconéctate y prueba</div>
+          <div class="bt-desc">Cierra la app. El difusor debería activarse correctamente en su próximo ciclo. Si estás dentro del horario configurado, debería arrancar de inmediato.</div>
         </div>
       </div>
     </div>
 
     <div class="alert-box ok" style="margin-top:16px;">
       <span class="alert-icon">💡</span>
-      <span>Si el difusor estuvo apagado mucho tiempo (más de 24 horas), su reloj puede haberse perdido completamente. La sincronización desde la app lo corrige en segundos.</span>
+      <span>Si el difusor estuvo apagado mucho tiempo (más de 24 horas), su reloj puede haberse perdido. Con solo conectarte a la app vía Bluetooth la hora se corrige automáticamente en segundos.</span>
     </div>
 
     <div class="divider"></div>
@@ -1370,6 +1357,10 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
 <div class="screen" id="screen-horario-programar">
   <div class="card">
     <div class="step-tag">Guía de configuración</div>
+    <div class="alert-box danger" style="margin-bottom:16px;">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>Solo modifica el horario si es estrictamente necesario.</strong> Todos los demás parámetros (intensidad, ciclos) fueron configurados por nuestros técnicos. Si necesitas más cambios, contáctanos y lo hacemos nosotros.</div>
+    </div>
     <div class="result blue">
       <div class="res-head"><span class="res-icon">🕐</span><h3>Cómo programar el horario</h3></div>
       <ul class="steps">
@@ -1377,10 +1368,10 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
         <li><span class="sn">2</span><span>Selecciona tu dispositivo de la lista. Ingresa la contraseña <span class="code-pill">8888</span>.</span></li>
         <li><span class="sn">3</span><span>Navega a <strong>Programación</strong> o <strong>Schedule</strong>.</span></li>
         <li><span class="sn">4</span><span>Selecciona los <strong>días activos</strong> y configura la hora de inicio y fin.</span></li>
-        <li><span class="sn">5</span><span>Guarda y verifica que la <strong>hora del sistema sea correcta</strong>. Si no lo es, usa "Calibrar hora".</span></li>
+        <li><span class="sn">5</span><span>Verifica que el horario de inicio y fin coincida con el horario comercial de la tienda. Guarda los cambios.</span></li>
       </ul>
     </div>
-    <div class="info-box">💡 Si la hora del sistema está desfasada, el horario no respetará tu programación — sincroniza primero desde la opción "Calibrar hora" o "Sync Time".</div>
+    <div class="info-box">💡 Si la hora del sistema está desfasada, el horario no respetará tu programación — primero conéctate a la app ScentMarketing vía Bluetooth para sincronizarla automáticamente.</div>
     <div class="btn-row">
       <button class="btn btn-primary" onclick="go('home')">← Inicio</button>
       <button class="btn btn-secondary" onclick="go('hora-app')">Descargar la app</button>
@@ -1390,19 +1381,24 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
 
 <div class="screen" id="screen-horario-intensidad">
   <div class="card">
-    <div class="step-tag">Guía de configuración</div>
+    <div class="step-tag">Ajuste de intensidad</div>
     <div class="result blue">
-      <div class="res-head"><span class="res-icon">🎚️</span><h3>Cómo ajustar la intensidad</h3></div>
+      <div class="res-head"><span class="res-icon">🎚️</span><h3>La intensidad la gestiona tu ejecutivo ZUNI</h3></div>
+      <p style="font-size:14px;color:#555;margin-bottom:10px;">La configuración de intensidad fue ajustada por nuestros técnicos según las características específicas de tu espacio. Modificarla por cuenta propia puede afectar la experiencia y el consumo de fragancia.</p>
       <ul class="steps">
-        <li><span class="sn">1</span><span>Accede a la app ScentMarketing o al menú del display → <strong>Configuración → Intensidad</strong>.</span></li>
-        <li><span class="sn">2</span><span>Espacio pequeño u oficina: <strong>G06–G08</strong>.</span></li>
-        <li><span class="sn">3</span><span>Espacio estándar cerrado (Tipo A, hasta 130 m²): <strong>G08–G12</strong>.</span></li>
-        <li><span class="sn">4</span><span>Espacio con apertura de puertas (Tipo B): <strong>G12–G16</strong>.</span></li>
-        <li><span class="sn">5</span><span>Centro comercial o alto tráfico (Tipo C): <strong>G16–G20</strong>.</span></li>
-        <li><span class="sn">6</span><span>Guarda y espera <strong>5 minutos</strong> para notar la diferencia.</span></li>
+        <li><span class="sn">1</span><span>Si sientes que el aroma es <strong>demasiado fuerte o muy débil</strong>, contáctanos directamente.</span></li>
+        <li><span class="sn">2</span><span>Un ejecutivo ZUNI evaluará tu espacio y realizará el ajuste correcto sin afectar tu servicio.</span></li>
       </ul>
     </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="go('home')">← Inicio</button></div>
+    <div class="alert-box ok"><span class="alert-icon">💡</span><span>Cualquier ajuste de intensidad se realiza <strong>sin costo adicional</strong> dentro de tu servicio.</span></div>
+    <div class="escalate-box">
+      <div class="escalate-title">Solicitar ajuste de intensidad</div>
+      <div class="escalate-nums">
+        <a class="btn btn-phone" href="tel:3330405600">📞 33 3040 5600 ext. 3</a>
+        <a class="btn btn-wa" href="https://wa.me/523316719518?text=Hola,%20quisiera%20solicitar%20un%20ajuste%20de%20intensidad%20en%20mi%20difusor%20ZUNI." target="_blank">💬 WhatsApp</a>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-secondary" onclick="go('home')">← Inicio</button></div>
   </div>
 </div>
 
@@ -1421,11 +1417,6 @@ main { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
     </div>
     <div class="info-box">⚠️ <strong>Importante:</strong> No mezcles fragancias de distintas marcas. Usar fragancia incompatible puede dañar la bomba y anular la garantía.</div>
 
-    <h4 style="font-family:'DM Serif Display',serif;font-size:16px;margin:22px 0 12px;color:var(--ink);">📹 Video tutorial — Cómo hacer refill</h4>
-    <div class="video-wrap">
-      <iframe src="https://www.youtube.com/embed/1xcSDYy3Dl4?si=fokkvZHMjo3MQHE_" title="Tutorial refill ZUNI" allowfullscreen></iframe>
-    </div>
-    <p style="font-size:12px;color:var(--smoke);margin-top:8px;text-align:center;">Duración aprox. 4 minutos</p>
 
     <div class="divider"></div>
 
